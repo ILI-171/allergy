@@ -1,21 +1,24 @@
 Sub alergy_list()
 
     Dim j As Long
+    Dim idx As Long
     Dim sheet_name As String
     Dim alergy_range As Range
     Dim alergy_range_1 As Range
     Dim alergy_range_2 As Range
+    Dim menu_sheets As Variant
+    Dim row_colors As Variant
     
     Application.Calculation = xlCalculationManual
     Application.ScreenUpdating = False
-    
+
     sheet_name = "利用可能リスト"
-    
+
     ThisWorkbook.Sheets(sheet_name).Range("B6:BE600").ClearContents
     ThisWorkbook.Sheets(sheet_name).Range("B5:BE700").Interior.color = vbWhite
-    
+
     alergy_column = 3
-    
+
     Set alergy_range = ThisWorkbook.Sheets(sheet_name).Range("B3:AC3").Find("TRUE")
     
     If alergy_range Is Nothing Then
@@ -26,15 +29,13 @@ Sub alergy_list()
     Else
     
         alergy_num = WorksheetFunction.CountIf(Rows(3), "TRUE")
-        
-        Call alergy_check("冷菜　魚", alergy_num, rgbSkyBlue)
-        Call alergy_check("冷菜　肉", alergy_num, rgbSkyBlue)
-        Call alergy_check("冷菜　その他", alergy_num, rgbSkyBlue)
-        Call alergy_check("温製　魚", alergy_num, rgbSandyBrown)
-        Call alergy_check("温製　肉", alergy_num, rgbSandyBrown)
-        Call alergy_check("温製　その他", alergy_num, rgbSandyBrown)
-        Call alergy_check("デザート　冷製", alergy_num, rgbPaleGreen)
-        Call alergy_check("デザート　温製", alergy_num, rgbPaleGreen)
+
+        menu_sheets = Array("冷菜　魚", "冷菜　肉", "冷菜　その他", "温製　魚", "温製　肉", "温製　その他", "デザート　冷製", "デザート　温製")
+        row_colors = Array(rgbSkyBlue, rgbSkyBlue, rgbSkyBlue, rgbSandyBrown, rgbSandyBrown, rgbSandyBrown, rgbPaleGreen, rgbPaleGreen)
+
+        For idx = LBound(menu_sheets) To UBound(menu_sheets)
+            Call alergy_check(CStr(menu_sheets(idx)), alergy_num, row_colors(idx))
+        Next
         
     End If
     
