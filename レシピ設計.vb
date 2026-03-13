@@ -5,8 +5,8 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     Dim clear_columns As Variant
     Dim idx As Long
 
-    vendor_sheets = Array("業者１", "業者２", "業者３", "業者４", "業者５", "業者６", "業者７", "業者８", "パートレシピ")
-    clear_columns = Array(2, 7, 8, 9, 10, 11, 12, 15)
+    vendor_sheets = settings_vendor_sheets(True)
+    clear_columns = settings_recipe_clear_columns()
     
     For Each cell In Target
         If Not Intersect(cell, Me.Range("A14:A33")) Is Nothing Then
@@ -39,7 +39,7 @@ Private Sub collect_allergens(ws As Worksheet, start_row As Long, end_row As Lon
     Dim idx As Long
     Dim allergen_name As String
 
-    allergens = Array("えび", "かに", "くるみ", "小麦", "そば", "卵", "乳", "落花生", "アーモンド", "あわび", "いか", "いくら", "オレンジ", "カシューナッツ", "キウイフルーツ", "牛肉", "ごま", "さけ", "さば", "大豆", "鶏肉", "バナナ", "豚肉", "まつたけ", "もも", "やまいも", "りんご", "ゼラチン")
+    allergens = settings_allergens()
 
     For i = start_row To end_row
         For idx = LBound(allergens) To UBound(allergens)
@@ -73,8 +73,8 @@ Function smf(sheet, ip, r)
     
     If Not ipoter_rng Is Nothing Then
         ip_row = ipoter_rng.Row
-        source_columns = Array(2, 6, 7, 10, 12, "AS")
-        target_columns = Array(2, 7, 9, 10, 12, 15)
+        source_columns = settings_recipe_source_columns()
+        target_columns = settings_recipe_target_columns()
 
         For idx = LBound(source_columns) To UBound(source_columns)
             tw.Cells(r, target_columns(idx)) = ws.Cells(ip_row, source_columns(idx)).Value

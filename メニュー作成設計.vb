@@ -7,7 +7,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
     Dim menu_sheets As Variant
     Dim alergy(1 To 8)
 
-    menu_sheets = Array("冷菜　魚", "冷菜　肉", "冷菜　その他", "温製　魚", "温製　肉", "温製　その他", "デザート　冷製", "デザート　温製")
+    menu_sheets = settings_menu_category_sheets()
     
     Set rng = Me.Range("B11")
     
@@ -56,7 +56,7 @@ Private Sub Worksheet_Change(ByVal Target As Range)
             End If
             
             Dim menu_display_sheets As Variant
-            menu_display_sheets = Array("メニュー表示(1-50)", "メニュー表示(51-100)", "メニュー表示(101-150)", "メニュー表示(151-200)")
+            menu_display_sheets = settings_menu_display_sheets()
             sheetName = CStr(menu_display_sheets((menu_num - 1) \ 50))
             
             ThisWorkbook.Sheets(sheetName).Unprotect Password:="0385"
@@ -139,7 +139,7 @@ Private Function merge_range_str(row_num As Long, c As Long) As String
     Dim col_letters As Variant
     Dim parts As Variant
 
-    col_letters = Array("A:K", "L:V")
+    col_letters = settings_merge_col_ranges()
     parts = Split(CStr(col_letters(IIf(c = 1, 0, 1))), ":")
     merge_range_str = parts(0) & row_num & ":" & parts(1) & row_num
 

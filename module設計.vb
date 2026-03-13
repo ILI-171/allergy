@@ -30,8 +30,8 @@ Sub alergy_list()
     
         alergy_num = WorksheetFunction.CountIf(Rows(3), "TRUE")
 
-        menu_sheets = Array("冷菜　魚", "冷菜　肉", "冷菜　その他", "温製　魚", "温製　肉", "温製　その他", "デザート　冷製", "デザート　温製")
-        row_colors = Array(rgbSkyBlue, rgbSkyBlue, rgbSkyBlue, rgbSandyBrown, rgbSandyBrown, rgbSandyBrown, rgbPaleGreen, rgbPaleGreen)
+        menu_sheets = settings_menu_category_sheets()
+        row_colors = settings_menu_category_colors()
 
         For idx = LBound(menu_sheets) To UBound(menu_sheets)
             Call alergy_check(CStr(menu_sheets(idx)), alergy_num, row_colors(idx))
@@ -173,8 +173,8 @@ Private Sub copy_base_columns(source_sheet As String, source_row As Long, target
     Dim target_columns As Variant
     Dim idx As Long
 
-    source_columns = Array("A", "B", "C", "D", "E")
-    target_columns = Array("B", "E", "K", "Q", "AA")
+    source_columns = settings_alergy_copy_base_source_columns()
+    target_columns = settings_alergy_copy_base_target_columns()
 
     For idx = LBound(source_columns) To UBound(source_columns)
         ThisWorkbook.Sheets(target_sheet).Range(target_columns(idx) & target_row) = _
@@ -191,10 +191,10 @@ Private Sub copy_detail_columns(source_sheet As String, source_row As Long, targ
     Dim target_end_columns As Variant
     Dim idx As Long
 
-    source_start_columns = Array("H", "S")
-    source_end_columns = Array("O", "AL")
-    target_start_columns = Array("AD", "AL")
-    target_end_columns = Array("AK", "BE")
+    source_start_columns = settings_alergy_copy_detail_source_start_columns()
+    source_end_columns = settings_alergy_copy_detail_source_end_columns()
+    target_start_columns = settings_alergy_copy_detail_target_start_columns()
+    target_end_columns = settings_alergy_copy_detail_target_end_columns()
 
     For idx = LBound(source_start_columns) To UBound(source_start_columns)
         ThisWorkbook.Sheets(source_sheet).Range(source_start_columns(idx) & source_row & ":" & source_end_columns(idx) & source_row).Copy

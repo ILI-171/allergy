@@ -22,9 +22,9 @@ Sub checkbox()
     Count = 0
     ale = ""
 
-    check_rows = Array(22, 25, 28)
-    label_rows = Array(21, 24, 27)
-    end_columns = Array(11, 13, 13)
+    check_rows = settings_checkbox_rows()
+    label_rows = settings_checkbox_label_rows()
+    end_columns = settings_checkbox_end_columns()
 
     For idx = LBound(check_rows) To UBound(check_rows)
         Call collect_checked_allergens(tw, check_rows(idx), label_rows(idx), 4, end_columns(idx), ale, Count)
@@ -50,8 +50,8 @@ Sub all()
     
     ale = ""
 
-    clear_rows = Array(22, 25, 28)
-    end_columns = Array(11, 13, 13)
+    clear_rows = settings_checkbox_rows()
+    end_columns = settings_checkbox_end_columns()
 
     For idx = LBound(clear_rows) To UBound(clear_rows)
         Call clear_checkbox_row(tw, clear_rows(idx), 4, end_columns(idx))
@@ -376,17 +376,13 @@ End Sub
 
 Private Function get_vendor_sheets(include_part_recipe As Boolean) As Variant
 
-    If include_part_recipe Then
-        get_vendor_sheets = Array("業者１", "業者２", "業者３", "業者４", "業者５", "業者６", "業者７", "業者８", "パートレシピ")
-    Else
-        get_vendor_sheets = Array("業者１", "業者２", "業者３", "業者４", "業者５", "業者６", "業者７", "業者８")
-    End If
+    get_vendor_sheets = settings_vendor_sheets(include_part_recipe)
 
 End Function
 
 Private Function get_allergen_list() As Variant
 
-    get_allergen_list = Array("えび", "かに", "くるみ", "小麦", "そば", "卵", "乳", "落花生", "アーモンド", "あわび", "いか", "いくら", "オレンジ", "カシューナッツ", "キウイフルーツ", "牛肉", "ごま", "さけ", "さば", "大豆", "鶏肉", "バナナ", "豚肉", "まつたけ", "もも", "やまいも", "りんご", "ゼラチン")
+    get_allergen_list = settings_allergens()
 
 End Function
 
