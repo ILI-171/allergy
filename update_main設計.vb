@@ -1,45 +1,35 @@
 Sub search_menu()
 '既製品の検索
-    Call search_menu_f("業者１")
-    Call search_menu_f("業者２")
-    Call search_menu_f("業者３")
-    Call search_menu_f("業者４")
-    Call search_menu_f("業者５")
-    Call search_menu_f("業者６")
-    Call search_menu_f("業者７")
-    Call search_menu_f("業者８")
+    Dim sheet_names As Variant
+    Dim i As Long
+
+    sheet_names = get_vendor_sheets(False)
+
+    For i = LBound(sheet_names) To UBound(sheet_names)
+        Call search_menu_f(CStr(sheet_names(i)))
+    Next
 
 End Sub
 Sub checkbox()
 'チェックボックスの内容を文字に直す
     Dim tw As Worksheet
+    Dim check_rows As Variant
+    Dim label_rows As Variant
+    Dim end_columns As Variant
+    Dim idx As Long
+
     Set tw = ThisWorkbook.Sheets("レシピ更新")
     Count = 0
     ale = ""
-    
-    For i = 4 To 11
-        If tw.Cells(22, i).Value = True Then
-            ale = ale & " " & tw.Cells(21, i).Text
-        Else
-            Count = Count + 1
-        End If
-    Next i
-    
-    For i = 4 To 13
-        If tw.Cells(25, i).Value = True Then
-            ale = ale & " " & tw.Cells(24, i).Text
-        Else
-            Count = Count + 1
-        End If
-    Next i
-    
-    For i = 4 To 13
-        If tw.Cells(28, i).Value = True Then
-            ale = ale & " " & tw.Cells(27, i).Text
-        Else
-            Count = Count + 1
-        End If
-    Next i
+
+    check_rows = Array(22, 25, 28)
+    label_rows = Array(21, 24, 27)
+    end_columns = Array(11, 13, 13)
+
+    For idx = LBound(check_rows) To UBound(check_rows)
+        Call collect_checked_allergens(tw, check_rows(idx), label_rows(idx), 4, end_columns(idx), ale, Count)
+    Next
+
     If Count = 28 Then
         ale = "/"
     End If
@@ -52,21 +42,20 @@ Sub all()
     Application.ScreenUpdating = False
 
     Dim tw As Worksheet
+    Dim clear_rows As Variant
+    Dim end_columns As Variant
+    Dim idx As Long
+
     Set tw = ThisWorkbook.Sheets("レシピ更新")
     
     ale = ""
-    
-    For i = 4 To 11
-        tw.Cells(22, i) = False
-    Next i
-    
-    For i = 4 To 13
-        tw.Cells(25, i) = False
-    Next i
-    
-    For i = 4 To 13
-        tw.Cells(28, i) = False
-    Next i
+
+    clear_rows = Array(22, 25, 28)
+    end_columns = Array(11, 13, 13)
+
+    For idx = LBound(clear_rows) To UBound(clear_rows)
+        Call clear_checkbox_row(tw, clear_rows(idx), 4, end_columns(idx))
+    Next
     
     Call checkbox
     
@@ -79,17 +68,16 @@ Sub update()
 '既製品アレルギー内容の更新
 
     Dim tw As Worksheet
+    Dim sheet_names As Variant
+    Dim i As Long
+
     Set tw = ThisWorkbook.Sheets("レシピ更新")
     tw.Cells(10, 14) = tw.Cells(18, 4).Text
-    
-    Call update_f("業者１")
-    Call update_f("業者２")
-    Call update_f("業者３")
-    Call update_f("業者４")
-    Call update_f("業者５")
-    Call update_f("業者６")
-    Call update_f("業者７")
-    Call update_f("業者８")
+
+    sheet_names = get_vendor_sheets(False)
+    For i = LBound(sheet_names) To UBound(sheet_names)
+        Call update_f(CStr(sheet_names(i)))
+    Next
     
     For i = 34 To 68 Step 2
         If tw.Cells(i, "D").Value = "" Then
@@ -130,46 +118,12 @@ Sub update_all()
     Floor = tw.Cells(4, 14).Value
     ReDim path(1 To 100, 1 To 10)
     ReDim j(1 To 10)
-    Dim alergy(1 To 28)
+    Dim alergy As Variant
     Dim ale_c(1 To 28)
-    Dim sheet(1 To 9)
-    alergy(1) = "えび"
-    alergy(2) = "かに"
-    alergy(3) = "くるみ"
-    alergy(4) = "小麦"
-    alergy(5) = "そば"
-    alergy(6) = "卵"
-    alergy(7) = "乳"
-    alergy(8) = "落花生"
-    alergy(9) = "アーモンド"
-    alergy(10) = "あわび"
-    alergy(11) = "いか"
-    alergy(12) = "いくら"
-    alergy(13) = "オレンジ"
-    alergy(14) = "カシューナッツ"
-    alergy(15) = "キウイフルーツ"
-    alergy(16) = "牛肉"
-    alergy(17) = "ごま"
-    alergy(18) = "さけ"
-    alergy(19) = "さば"
-    alergy(20) = "大豆"
-    alergy(21) = "鶏肉"
-    alergy(22) = "バナナ"
-    alergy(23) = "豚肉"
-    alergy(24) = "まつたけ"
-    alergy(25) = "もも"
-    alergy(26) = "やまいも"
-    alergy(27) = "りんご"
-    alergy(28) = "ゼラチン"
-    sheet(1) = "業者１"
-    sheet(2) = "業者２"
-    sheet(3) = "業者３"
-    sheet(4) = "業者４"
-    sheet(5) = "業者５"
-    sheet(6) = "業者６"
-    sheet(7) = "業者７"
-    sheet(8) = "業者８"
-    sheet(9) = "パートレシピ"
+    Dim sheet_names As Variant
+
+    alergy = get_allergen_list()
+    sheet_names = get_vendor_sheets(True)
     x = 11
     folder_path = tw.Cells(4, 8).Text
     
@@ -203,7 +157,7 @@ Sub update_all()
         Do While file_name <> ""
             Set mb = xlApp.Workbooks.Open(Filename:=folder_path & "\" & file_name, UpdateLinks:=0)
             '処理内容
-            For x = 1 To 28
+            For x = LBound(alergy) To UBound(alergy)
                 ale_c(x) = 0
             Next x
             num = mb.Sheets(1).Cells(5, 10).Value
@@ -211,13 +165,13 @@ Sub update_all()
             For x = mb.Sheets(1).Columns(1).Find("IPOTER番号").Row + 1 To mb.Sheets(1).Columns(1).Find("IPOTER番号").Row + 20
                 ipoter = Replace(mb.Sheets(1).Cells(x, 1).Value, Chr(160), " ")
                 ipoter = Trim(ipoter)
-                For y = 1 To 9
-                    Set ipoter_rng = ThisWorkbook.Sheets(sheet(y)).Columns(1).Find(ipoter)
+                For y = LBound(sheet_names) To UBound(sheet_names)
+                    Set ipoter_rng = ThisWorkbook.Sheets(sheet_names(y)).Columns(1).Find(ipoter)
                     If Not ipoter_rng Is Nothing Then
                         ipoter_row = ipoter_rng.Row
-                        ale_in = ThisWorkbook.Sheets(sheet(y)).Cells(ipoter_row, 12).Text
+                        ale_in = ThisWorkbook.Sheets(sheet_names(y)).Cells(ipoter_row, 12).Text
                         mb.Sheets(1).Cells(x, 12) = ale_in
-                        For Z = 1 To 28
+                        For Z = LBound(alergy) To UBound(alergy)
                             ale_c(Z) = ale_c(Z) + InStr(ale_in, alergy(Z))
                         Next Z
                         Exit For
@@ -231,7 +185,7 @@ Sub update_all()
                 'Next y
             'Next x
             
-            For x = 1 To 28
+            For x = LBound(alergy) To UBound(alergy)
                 If ale_c(x) <> 0 Then
                     ale = ale & " " & alergy(x)
                 End If
@@ -243,9 +197,9 @@ Sub update_all()
                     ThisWorkbook.Sheets(x).Cells(num_rng.Row, 6) = ale
                 End If
                 
-                Set num_rng = ThisWorkbook.Sheets(sheet(9)).Columns(1).Find(num)
+                Set num_rng = ThisWorkbook.Sheets(sheet_names(UBound(sheet_names))).Columns(1).Find(num)
                 If Not num_rng Is Nothing Then
-                    ThisWorkbook.Sheets(sheet(9)).Cells(num_rng.Row, 12) = ale
+                    ThisWorkbook.Sheets(sheet_names(UBound(sheet_names))).Cells(num_rng.Row, 12) = ale
                     Exit For
                 End If
             Next x
@@ -271,7 +225,7 @@ Sub update_all()
                 Do While file_name <> ""
                     Set mb = xlApp.Workbooks.Open(Filename:=path(k, i) & "\" & file_name, UpdateLinks:=0)
                     '処理内容
-                    For x = 1 To 28
+                    For x = LBound(alergy) To UBound(alergy)
                         ale_c(x) = 0
                     Next x
                     num = mb.Sheets(1).Cells(5, 10).Value
@@ -279,13 +233,13 @@ Sub update_all()
                     For x = mb.Sheets(1).Columns(1).Find("IPOTER番号").Row + 1 To mb.Sheets(1).Columns(1).Find("IPOTER番号").Row + 20
                         ipoter = Replace(mb.Sheets(1).Cells(x, 1).Value, Chr(160), " ")
                         ipoter = Trim(ipoter)
-                        For y = 1 To 9
-                            Set ipoter_rng = ThisWorkbook.Sheets(sheet(y)).Columns(1).Find(ipoter)
+                        For y = LBound(sheet_names) To UBound(sheet_names)
+                            Set ipoter_rng = ThisWorkbook.Sheets(sheet_names(y)).Columns(1).Find(ipoter)
                             If Not ipoter_rng Is Nothing Then
                                 ipoter_row = ipoter_rng.Row
-                                ale_in = ThisWorkbook.Sheets(sheet(y)).Cells(ipoter_row, 12).Text
+                                ale_in = ThisWorkbook.Sheets(sheet_names(y)).Cells(ipoter_row, 12).Text
                                 mb.Sheets(1).Cells(x, 12) = ale_in
-                                For Z = 1 To 28
+                                For Z = LBound(alergy) To UBound(alergy)
                                     ale_c(Z) = ale_c(Z) + InStr(ale_in, alergy(Z))
                                 Next Z
                             Exit For
@@ -299,7 +253,7 @@ Sub update_all()
                         'Next y
                     'Next x
                     
-                    For x = 1 To 28
+                    For x = LBound(alergy) To UBound(alergy)
                         If ale_c(x) <> 0 Then
                             ale = ale & " " & alergy(x)
                         End If
@@ -311,9 +265,9 @@ Sub update_all()
                             ThisWorkbook.Sheets(x).Cells(num_rng.Row, 6) = ale
                         End If
                         
-                        Set num_rng = ThisWorkbook.Sheets(sheet(9)).Columns(1).Find(num)
+                        Set num_rng = ThisWorkbook.Sheets(sheet_names(UBound(sheet_names))).Columns(1).Find(num)
                         If Not num_rng Is Nothing Then
-                            ThisWorkbook.Sheets(sheet(9)).Cells(num_rng.Row, 12) = ale
+                            ThisWorkbook.Sheets(sheet_names(UBound(sheet_names))).Cells(num_rng.Row, 12) = ale
                             Exit For
                         End If
                     Next x
@@ -363,37 +317,10 @@ Function search_menu_f(sheet)
     Dim tw As Worksheet
     Dim ipoter_rng As Range
     Dim ale_rng As Range
-    Dim alergy(1 To 28)
+    Dim alergy As Variant
     Set ws = ThisWorkbook.Sheets(sheet)
     Set tw = ThisWorkbook.Sheets("レシピ更新")
-    alergy(1) = "えび"
-    alergy(2) = "かに"
-    alergy(3) = "くるみ"
-    alergy(4) = "小麦"
-    alergy(5) = "そば"
-    alergy(6) = "卵"
-    alergy(7) = "乳"
-    alergy(8) = "落花生"
-    alergy(9) = "アーモンド"
-    alergy(10) = "あわび"
-    alergy(11) = "いか"
-    alergy(12) = "いくら"
-    alergy(13) = "オレンジ"
-    alergy(14) = "カシューナッツ"
-    alergy(15) = "キウイフルーツ"
-    alergy(16) = "牛肉"
-    alergy(17) = "ごま"
-    alergy(18) = "さけ"
-    alergy(19) = "さば"
-    alergy(20) = "大豆"
-    alergy(21) = "鶏肉"
-    alergy(22) = "バナナ"
-    alergy(23) = "豚肉"
-    alergy(24) = "まつたけ"
-    alergy(25) = "もも"
-    alergy(26) = "やまいも"
-    alergy(27) = "りんご"
-    alergy(28) = "ゼラチン"
+    alergy = get_allergen_list()
     ipoter = tw.Cells(4, 3).Text
     menu = tw.Cells(4, 6).Text
     
@@ -409,7 +336,7 @@ Function search_menu_f(sheet)
         tw.Cells(18, 4) = ale
         tw.Cells(4, 14) = ws.Cells(ipoter_row, 7)
         
-        For i = 1 To 28
+        For i = LBound(alergy) To UBound(alergy)
             If InStr(ale, alergy(i)) <> 0 Then
                 Set ale_rng = tw.Range("D21:M28").Find(alergy(i))
                 ale_r = ale_rng.Row
@@ -421,6 +348,48 @@ Function search_menu_f(sheet)
     End If
 
 End Function
+
+Private Sub collect_checked_allergens(tw As Worksheet, check_row As Long, label_row As Long, _
+    start_column As Long, end_column As Long, ByRef ale As String, ByRef item_count As Long)
+
+    Dim i As Long
+
+    For i = start_column To end_column
+        If tw.Cells(check_row, i).Value = True Then
+            ale = ale & " " & tw.Cells(label_row, i).Text
+        Else
+            item_count = item_count + 1
+        End If
+    Next
+
+End Sub
+
+Private Sub clear_checkbox_row(tw As Worksheet, row_num As Long, start_column As Long, end_column As Long)
+
+    Dim i As Long
+
+    For i = start_column To end_column
+        tw.Cells(row_num, i) = False
+    Next
+
+End Sub
+
+Private Function get_vendor_sheets(include_part_recipe As Boolean) As Variant
+
+    If include_part_recipe Then
+        get_vendor_sheets = Array("業者１", "業者２", "業者３", "業者４", "業者５", "業者６", "業者７", "業者８", "パートレシピ")
+    Else
+        get_vendor_sheets = Array("業者１", "業者２", "業者３", "業者４", "業者５", "業者６", "業者７", "業者８")
+    End If
+
+End Function
+
+Private Function get_allergen_list() As Variant
+
+    get_allergen_list = Array("えび", "かに", "くるみ", "小麦", "そば", "卵", "乳", "落花生", "アーモンド", "あわび", "いか", "いくら", "オレンジ", "カシューナッツ", "キウイフルーツ", "牛肉", "ごま", "さけ", "さば", "大豆", "鶏肉", "バナナ", "豚肉", "まつたけ", "もも", "やまいも", "りんご", "ゼラチン")
+
+End Function
+
 Function update_f(sheet)
 
     Dim ws As Worksheet

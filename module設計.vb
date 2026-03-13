@@ -87,12 +87,7 @@ Function alergy_check(sheet, num, color)
             If ThisWorkbook.Sheets(sheet).Cells(i, 3).Text = "" Then
             
             ElseIf InStr(ThisWorkbook.Sheets(sheet).Cells(i, 3), "【") > 0 Then
-            
-                ThisWorkbook.Sheets(sheet_name).Range("B" & k) = ThisWorkbook.Sheets(sheet).Range("A" & i).Text
-                ThisWorkbook.Sheets(sheet_name).Range("E" & k) = ThisWorkbook.Sheets(sheet).Range("B" & i).Text
-                ThisWorkbook.Sheets(sheet_name).Range("K" & k) = ThisWorkbook.Sheets(sheet).Range("C" & i).Text
-                ThisWorkbook.Sheets(sheet_name).Range("Q" & k) = ThisWorkbook.Sheets(sheet).Range("D" & i).Text
-                ThisWorkbook.Sheets(sheet_name).Range("AA" & k) = ThisWorkbook.Sheets(sheet).Range("E" & i).Text
+                Call copy_base_columns(sheet, i, sheet_name, k)
                 ThisWorkbook.Sheets(sheet_name).Range("B" & k & ":AA" & k).Interior.color = vbWhite
                 
                 k = k + 1
@@ -100,16 +95,8 @@ Function alergy_check(sheet, num, color)
             Else
             
                 If ThisWorkbook.Sheets(sheet).Cells(i, acp).Value = "" Then
-             
-                    ThisWorkbook.Sheets(sheet_name).Range("B" & k) = ThisWorkbook.Sheets(sheet).Range("A" & i).Text
-                    ThisWorkbook.Sheets(sheet_name).Range("E" & k) = ThisWorkbook.Sheets(sheet).Range("B" & i).Text
-                    ThisWorkbook.Sheets(sheet_name).Range("K" & k) = ThisWorkbook.Sheets(sheet).Range("C" & i).Text
-                    ThisWorkbook.Sheets(sheet_name).Range("Q" & k) = ThisWorkbook.Sheets(sheet).Range("D" & i).Text
-                    ThisWorkbook.Sheets(sheet_name).Range("AA" & k) = ThisWorkbook.Sheets(sheet).Range("E" & i).Text
-                    ThisWorkbook.Sheets(sheet).Range("H" & i & ":O" & i).Copy
-                    ThisWorkbook.Sheets(sheet_name).Range("AD" & k & ":AK" & k).PasteSpecial Paste:=xlPasteValues
-                    ThisWorkbook.Sheets(sheet).Range("S" & i & ":AL" & i).Copy
-                    ThisWorkbook.Sheets(sheet_name).Range("AL" & k & ":BE" & k).PasteSpecial Paste:=xlPasteValues
+                    Call copy_base_columns(sheet, i, sheet_name, k)
+                    Call copy_detail_columns(sheet, i, sheet_name, k)
                     ThisWorkbook.Sheets(sheet_name).Range("B" & k & ":AA" & k).Interior.color = color
                 
                     k = k + 1
@@ -129,12 +116,7 @@ Function alergy_check(sheet, num, color)
             If ThisWorkbook.Sheets(sheet).Cells(i, 3).Text = "" Then
             
             ElseIf InStr(ThisWorkbook.Sheets(sheet).Cells(i, 3), "【") > 0 Then
-            
-                ThisWorkbook.Sheets(sheet_name).Range("B" & k) = ThisWorkbook.Sheets(sheet).Range("A" & i).Text
-                ThisWorkbook.Sheets(sheet_name).Range("E" & k) = ThisWorkbook.Sheets(sheet).Range("B" & i).Text
-                ThisWorkbook.Sheets(sheet_name).Range("K" & k) = ThisWorkbook.Sheets(sheet).Range("C" & i).Text
-                ThisWorkbook.Sheets(sheet_name).Range("Q" & k) = ThisWorkbook.Sheets(sheet).Range("D" & i).Text
-                ThisWorkbook.Sheets(sheet_name).Range("AA" & k) = ThisWorkbook.Sheets(sheet).Range("E" & i).Text
+                Call copy_base_columns(sheet, i, sheet_name, k)
                 ThisWorkbook.Sheets(sheet_name).Range("B" & k & ":AA" & k).Interior.color = vbWhite
                 
                 k = k + 1
@@ -161,16 +143,8 @@ Function alergy_check(sheet, num, color)
                     If ThisWorkbook.Sheets(sheet).Cells(i, ac).Text = "" Then
                         
                         If j = num - 1 Then
-                        
-                            ThisWorkbook.Sheets(sheet_name).Range("B" & k) = ThisWorkbook.Sheets(sheet).Range("A" & i).Text
-                            ThisWorkbook.Sheets(sheet_name).Range("E" & k) = ThisWorkbook.Sheets(sheet).Range("B" & i).Text
-                            ThisWorkbook.Sheets(sheet_name).Range("K" & k) = ThisWorkbook.Sheets(sheet).Range("C" & i).Text
-                            ThisWorkbook.Sheets(sheet_name).Range("Q" & k) = ThisWorkbook.Sheets(sheet).Range("D" & i).Text
-                            ThisWorkbook.Sheets(sheet_name).Range("AA" & k) = ThisWorkbook.Sheets(sheet).Range("E" & i).Text
-                            ThisWorkbook.Sheets(sheet).Range("H" & i & ":O" & i).Copy
-                            ThisWorkbook.Sheets(sheet_name).Range("AD" & k & ":AK" & k).PasteSpecial Paste:=xlPasteValues
-                            ThisWorkbook.Sheets(sheet).Range("S" & i & ":AL" & i).Copy
-                            ThisWorkbook.Sheets(sheet_name).Range("AL" & k & ":BE" & k).PasteSpecial Paste:=xlPasteValues
+                            Call copy_base_columns(sheet, i, sheet_name, k)
+                            Call copy_detail_columns(sheet, i, sheet_name, k)
                             ThisWorkbook.Sheets(sheet_name).Range("B" & k & ":AA" & k).Interior.color = color
                             
                             k = k + 1
@@ -191,3 +165,39 @@ Function alergy_check(sheet, num, color)
     Application.ScreenUpdating = True
 
 End Function
+
+Private Sub copy_base_columns(source_sheet As String, source_row As Long, target_sheet As String, target_row As Long)
+
+    Dim source_columns As Variant
+    Dim target_columns As Variant
+    Dim idx As Long
+
+    source_columns = Array("A", "B", "C", "D", "E")
+    target_columns = Array("B", "E", "K", "Q", "AA")
+
+    For idx = LBound(source_columns) To UBound(source_columns)
+        ThisWorkbook.Sheets(target_sheet).Range(target_columns(idx) & target_row) = _
+            ThisWorkbook.Sheets(source_sheet).Range(source_columns(idx) & source_row).Text
+    Next
+
+End Sub
+
+Private Sub copy_detail_columns(source_sheet As String, source_row As Long, target_sheet As String, target_row As Long)
+
+    Dim source_start_columns As Variant
+    Dim source_end_columns As Variant
+    Dim target_start_columns As Variant
+    Dim target_end_columns As Variant
+    Dim idx As Long
+
+    source_start_columns = Array("H", "S")
+    source_end_columns = Array("O", "AL")
+    target_start_columns = Array("AD", "AL")
+    target_end_columns = Array("AK", "BE")
+
+    For idx = LBound(source_start_columns) To UBound(source_start_columns)
+        ThisWorkbook.Sheets(source_sheet).Range(source_start_columns(idx) & source_row & ":" & source_end_columns(idx) & source_row).Copy
+        ThisWorkbook.Sheets(target_sheet).Range(target_start_columns(idx) & target_row & ":" & target_end_columns(idx) & target_row).PasteSpecial Paste:=xlPasteValues
+    Next
+
+End Sub

@@ -1,180 +1,59 @@
 Private Sub Worksheet_Change(ByVal Target As Range)
     Application.ScreenUpdating = False
     Dim cell As Range
+    Dim vendor_sheets As Variant
+    Dim clear_columns As Variant
+    Dim idx As Long
+
+    vendor_sheets = Array("業者１", "業者２", "業者３", "業者４", "業者５", "業者６", "業者７", "業者８", "パートレシピ")
+    clear_columns = Array(2, 7, 8, 9, 10, 11, 12, 15)
     
     For Each cell In Target
         If Not Intersect(cell, Me.Range("A14:A33")) Is Nothing Then
             r = cell.Row
             Me.Cells(37, 1) = ""
-            Me.Cells(r, 2) = ""
-            Me.Cells(r, 7) = ""
-            Me.Cells(r, 8) = ""
-            Me.Cells(r, 9) = ""
-            Me.Cells(r, 10) = ""
-            Me.Cells(r, 11) = ""
-            Me.Cells(r, 12) = ""
-            Me.Cells(r, 15) = ""
+            For idx = LBound(clear_columns) To UBound(clear_columns)
+                Me.Cells(r, clear_columns(idx)) = ""
+            Next
+
             ipoter = cell.Value
+
             If ipoter <> "" Then
-                Call smf("業者１", ipoter, r)
-                Call smf("業者２", ipoter, r)
-                Call smf("業者３", ipoter, r)
-                Call smf("業者４", ipoter, r)
-                Call smf("業者５", ipoter, r)
-                Call smf("業者６", ipoter, r)
-                Call smf("業者７", ipoter, r)
-                Call smf("業者８", ipoter, r)
-                Call smf("パートレシピ", ipoter, r)
+                For idx = LBound(vendor_sheets) To UBound(vendor_sheets)
+                    Call smf(CStr(vendor_sheets(idx)), ipoter, r)
+                Next
             Else
                 Me.Range("B" & r & ":O" & r).ClearContents
             End If
-            For i = 14 To 33
-                If InStr(Me.Cells(i, 12).Value, "えび") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "えび") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "えび"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "かに") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "かに") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "かに"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "くるみ") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "くるみ") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "くるみ"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "小麦") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "小麦") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "小麦"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "そば") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "そば") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "そば"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "卵") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "卵") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "卵"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "乳") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "乳") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "乳"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "落花生") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "落花生") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "落花生"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "アーモンド") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "アーモンド") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "アーモンド"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "あわび") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "あわび") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "あわび"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "いか") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "いか") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "いか"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "いくら") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "いくら") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "いくら"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "オレンジ") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "オレンジ") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "オレンジ"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "カシューナッツ") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "カシューナッツ") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "カシューナッツ"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "キウイフルーツ") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "キウイフルーツ") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "キウイフルーツ"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "牛肉") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "牛肉") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "牛肉"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "ごま") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "ごま") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "ごま"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "さけ") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "さけ") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "さけ"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "さば") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "さば") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "さば"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "大豆") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "大豆") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "大豆"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "鶏肉") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "鶏肉") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "鶏肉"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "バナナ") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "バナナ") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "バナナ"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "豚肉") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "豚肉") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "豚肉"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "まつたけ") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "まつたけ") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "まつたけ"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "もも") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "もも") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "もも"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "やまいも") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "やまいも") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "やまいも"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "りんご") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "りんご") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "りんご"
-                    End If
-                End If
-                If InStr(Me.Cells(i, 12).Value, "ゼラチン") <> 0 Then
-                    If InStr(Me.Cells(37, 1).Value, "ゼラチン") = 0 Then
-                        Me.Cells(37, 1) = Me.Cells(37, 1).Value & " " & "ゼラチン"
-                    End If
-                End If
-            Next i
+            Call collect_allergens(Me, 14, 33, 12, 37, 1)
         End If
     Next
     
     Application.ScreenUpdating = True
 End Sub
+
+Private Sub collect_allergens(ws As Worksheet, start_row As Long, end_row As Long, source_column As Long, target_row As Long, target_column As Long)
+
+    Dim allergens As Variant
+    Dim i As Long
+    Dim idx As Long
+    Dim allergen_name As String
+
+    allergens = Array("えび", "かに", "くるみ", "小麦", "そば", "卵", "乳", "落花生", "アーモンド", "あわび", "いか", "いくら", "オレンジ", "カシューナッツ", "キウイフルーツ", "牛肉", "ごま", "さけ", "さば", "大豆", "鶏肉", "バナナ", "豚肉", "まつたけ", "もも", "やまいも", "りんご", "ゼラチン")
+
+    For i = start_row To end_row
+        For idx = LBound(allergens) To UBound(allergens)
+            allergen_name = CStr(allergens(idx))
+            If InStr(ws.Cells(i, source_column).Value, allergen_name) <> 0 Then
+                If InStr(ws.Cells(target_row, target_column).Value, allergen_name) = 0 Then
+                    ws.Cells(target_row, target_column) = ws.Cells(target_row, target_column).Value & " " & allergen_name
+                End If
+            End If
+        Next
+    Next
+
+End Sub
+
 Function smf(sheet, ip, r)
     
     Dim ws As Worksheet
@@ -194,13 +73,12 @@ Function smf(sheet, ip, r)
     
     If Not ipoter_rng Is Nothing Then
         ip_row = ipoter_rng.Row
-        tw.Cells(r, 2) = ws.Cells(ip_row, 2).Value
-        tw.Cells(r, 7) = ws.Cells(ip_row, 6).Value
-        tw.Cells(r, 9) = ws.Cells(ip_row, 7).Value
-        tw.Cells(r, 10) = ws.Cells(ip_row, 10).Value
-        'tw.Cells(r, 11) = ws.Cells(ip_row, 2).Value
-        tw.Cells(r, 12) = ws.Cells(ip_row, 12).Value
-        tw.Cells(r, 15) = ws.Cells(ip_row, "AS").Value
+        source_columns = Array(2, 6, 7, 10, 12, "AS")
+        target_columns = Array(2, 7, 9, 10, 12, 15)
+
+        For idx = LBound(source_columns) To UBound(source_columns)
+            tw.Cells(r, target_columns(idx)) = ws.Cells(ip_row, source_columns(idx)).Value
+        Next
     End If
 End Function
 
