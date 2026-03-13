@@ -1,7 +1,19 @@
+Option Explicit
+
 Private Sub Worksheet_Change(ByVal Target As Range)
     
     Application.ScreenUpdating = False
     
+    Dim i As Long
+    Dim j As Long
+    Dim r As Long
+    Dim rr As Long
+    Dim c As Long
+    Dim x As Long
+    Dim code_row As Long
+    Dim menu_num As Long
+    Dim code As String
+    Dim sheetName As String
     Dim rng As Range
     Dim code_rng As Range
     Dim menu_sheets As Variant

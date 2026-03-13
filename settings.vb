@@ -1,3 +1,5 @@
+Option Explicit
+
 Public Function settings_allergens() As Variant
 
     settings_allergens = Array("えび", "かに", "くるみ", "小麦", "そば", "卵", "乳", "落花生", "アーモンド", "あわび", "いか", "いくら", "オレンジ", "カシューナッツ", "キウイフルーツ", "牛肉", "ごま", "さけ", "さば", "大豆", "鶏肉", "バナナ", "豚肉", "まつたけ", "もも", "やまいも", "りんご", "ゼラチン")
@@ -89,29 +91,5 @@ End Function
 Public Function settings_alergy_copy_base_target_columns() As Variant
 
     settings_alergy_copy_base_target_columns = Array("B", "E", "K", "Q", "AA")
-
-End Function
-
-Public Function settings_alergy_copy_detail_source_start_columns() As Variant
-
-    settings_alergy_copy_detail_source_start_columns = Array("H", "S")
-
-End Function
-
-Public Function settings_alergy_copy_detail_source_end_columns() As Variant
-
-    settings_alergy_copy_detail_source_end_columns = Array("O", "AL")
-
-End Function
-
-Public Function settings_alergy_copy_detail_target_start_columns() As Variant
-
-    settings_alergy_copy_detail_target_start_columns = Array("AD", "AL")
-
-End Function
-
-Public Function settings_alergy_copy_detail_target_end_columns() As Variant
-
-    settings_alergy_copy_detail_target_end_columns = Array("AK", "BE")
 
 End Function

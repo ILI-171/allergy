@@ -1,9 +1,13 @@
+Option Explicit
+
 Private Sub Worksheet_Change(ByVal Target As Range)
     Application.ScreenUpdating = False
     Dim cell As Range
     Dim vendor_sheets As Variant
     Dim clear_columns As Variant
     Dim idx As Long
+    Dim r As Long
+    Dim ipoter As String
 
     vendor_sheets = settings_vendor_sheets(True)
     clear_columns = settings_recipe_clear_columns()
@@ -59,7 +63,11 @@ Function smf(sheet, ip, r)
     Dim ws As Worksheet
     Dim tw As Worksheet
     Dim ipoter_rng As Range
-    Dim menu_rng As Range
+    Dim idx As Long
+    Dim last As Long
+    Dim ip_row As Long
+    Dim source_columns As Variant
+    Dim target_columns As Variant
     Set ws = ThisWorkbook.Sheets(sheet)
     Set tw = ThisWorkbook.Sheets("レシピ  (新)")
     

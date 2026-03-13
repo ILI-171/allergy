@@ -1,3 +1,5 @@
+Option Explicit
+
 Private Sub Worksheet_Change(ByVal Target As Range)
     Application.ScreenUpdating = False
     Dim allergens As Variant

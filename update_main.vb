@@ -1,3 +1,5 @@
+Option Explicit
+
 Sub search_menu()
 '既製品の検索
     Dim sheet_names As Variant
@@ -13,6 +15,8 @@ End Sub
 Sub checkbox()
 'チェックボックスの内容を文字に直す
     Dim tw As Worksheet
+    Dim Count As Long
+    Dim ale As String
     Dim check_rows As Variant
     Dim label_rows As Variant
     Dim end_columns As Variant
@@ -42,6 +46,7 @@ Sub all()
     Application.ScreenUpdating = False
 
     Dim tw As Worksheet
+    Dim ale As String
     Dim clear_rows As Variant
     Dim end_columns As Variant
     Dim idx As Long
@@ -70,6 +75,7 @@ Sub update()
     Dim tw As Worksheet
     Dim sheet_names As Variant
     Dim i As Long
+    Dim j As Long
 
     Set tw = ThisWorkbook.Sheets("レシピ更新")
     tw.Cells(10, 14) = tw.Cells(18, 4).Text
@@ -98,6 +104,23 @@ Sub update()
 
 End Sub
 Sub update_all()
+    Dim i As Long
+    Dim k As Long
+    Dim h As Long
+    Dim Floor As Long
+    Dim folder_path As String
+    Dim ws_new As Worksheet
+    Dim objFSO As Object
+    Dim objFolder As Object
+    Dim objSubFolder As Object
+    Dim xlApp As Object
+    Dim path() As String
+    Dim j() As Long
+    Dim alergy As Variant
+    Dim sheet_names As Variant
+    Dim cell As Range
+    Dim mergedArea As Range
+
     
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
@@ -105,26 +128,16 @@ Sub update_all()
     
     UserForm1.Show vbModeless
     Dim tw As Worksheet
-    Dim ws As Worksheet
-    Dim mb As Workbook
-    Dim num_rng As Range
-    Dim ipoter_rng As Range
     Set tw = ThisWorkbook.Sheets("レシピ更新")
     Set ws_new = ThisWorkbook.Sheets("レシピ  (新)")
     Set objFSO = CreateObject("Scripting.FileSystemObject")
     Set xlApp = CreateObject("Excel.Application")
-    Dim path()
-    Dim j()
     Floor = tw.Cells(4, 14).Value
     ReDim path(1 To 100, 1 To 10)
     ReDim j(1 To 10)
-    Dim alergy As Variant
-    Dim ale_c(1 To 28)
-    Dim sheet_names As Variant
 
     alergy = get_allergen_list()
     sheet_names = get_vendor_sheets(True)
-    x = 11
     folder_path = tw.Cells(4, 8).Text
     
     '指定フォルダ内のフォルダパスをすべて取得
@@ -153,143 +166,15 @@ Sub update_all()
     
     'メニューエクセルを一つずつ検索し、各々更新していく(パートレシピの更新に対応するため、計2回同じ処理を行う)
     For h = 1 To 2
-        file_name = Dir(folder_path & "\*.xlsx")
-        Do While file_name <> ""
-            Set mb = xlApp.Workbooks.Open(Filename:=folder_path & "\" & file_name, UpdateLinks:=0)
-            '処理内容
-            For x = LBound(alergy) To UBound(alergy)
-                ale_c(x) = 0
-            Next x
-            num = mb.Sheets(1).Cells(5, 10).Value
-            y = 1
-            For x = mb.Sheets(1).Columns(1).Find("IPOTER番号").Row + 1 To mb.Sheets(1).Columns(1).Find("IPOTER番号").Row + 20
-                ipoter = Replace(mb.Sheets(1).Cells(x, 1).Value, Chr(160), " ")
-                ipoter = Trim(ipoter)
-                For y = LBound(sheet_names) To UBound(sheet_names)
-                    Set ipoter_rng = ThisWorkbook.Sheets(sheet_names(y)).Columns(1).Find(ipoter)
-                    If Not ipoter_rng Is Nothing Then
-                        ipoter_row = ipoter_rng.Row
-                        ale_in = ThisWorkbook.Sheets(sheet_names(y)).Cells(ipoter_row, 12).Text
-                        mb.Sheets(1).Cells(x, 12) = ale_in
-                        For Z = LBound(alergy) To UBound(alergy)
-                            ale_c(Z) = ale_c(Z) + InStr(ale_in, alergy(Z))
-                        Next Z
-                        Exit For
-                    End If
-                Next y
-            Next x
-            
-            'For x = 1 To 20
-                'For y = 1 To 28
-                    'ale_c(y) = ale_c(y) + InStr(tw.Cells(x, "BB").Text, alergy(y))
-                'Next y
-            'Next x
-            
-            For x = LBound(alergy) To UBound(alergy)
-                If ale_c(x) <> 0 Then
-                    ale = ale & " " & alergy(x)
-                End If
-            Next x
-            
-            For x = 11 To 18
-                Set num_rng = ThisWorkbook.Sheets(x).Columns(2).Find(num)
-                If Not num_rng Is Nothing Then
-                    ThisWorkbook.Sheets(x).Cells(num_rng.Row, 6) = ale
-                End If
-                
-                Set num_rng = ThisWorkbook.Sheets(sheet_names(UBound(sheet_names))).Columns(1).Find(num)
-                If Not num_rng Is Nothing Then
-                    ThisWorkbook.Sheets(sheet_names(UBound(sheet_names))).Cells(num_rng.Row, 12) = ale
-                    Exit For
-                End If
-            Next x
-            
-            y = mb.Sheets(1).Columns(1).Find("IPOTER番号").Row + 24
-            'For x = 1 To 20
-                'mb.Sheets(1).Cells(y, 12) = tw.Cells(x, "BB").Text
-                'y = y + 1
-            'Next x
-            mb.Sheets(1).Cells(y, 1) = ale
-            mb.Save
-            mb.Close
-            Set mb = Nothing
-            ale = ""
-            '処理ここまで
-            file_name = Dir
-        Loop
+        Call process_excel_files_in_folder(CStr(folder_path), xlApp, alergy, sheet_names)
             
         For i = 1 To 10
             For k = 1 To j(i)
-                
-                file_name = Dir(path(k, i) & "\*.xlsx")
-                Do While file_name <> ""
-                    Set mb = xlApp.Workbooks.Open(Filename:=path(k, i) & "\" & file_name, UpdateLinks:=0)
-                    '処理内容
-                    For x = LBound(alergy) To UBound(alergy)
-                        ale_c(x) = 0
-                    Next x
-                    num = mb.Sheets(1).Cells(5, 10).Value
-                    y = 1
-                    For x = mb.Sheets(1).Columns(1).Find("IPOTER番号").Row + 1 To mb.Sheets(1).Columns(1).Find("IPOTER番号").Row + 20
-                        ipoter = Replace(mb.Sheets(1).Cells(x, 1).Value, Chr(160), " ")
-                        ipoter = Trim(ipoter)
-                        For y = LBound(sheet_names) To UBound(sheet_names)
-                            Set ipoter_rng = ThisWorkbook.Sheets(sheet_names(y)).Columns(1).Find(ipoter)
-                            If Not ipoter_rng Is Nothing Then
-                                ipoter_row = ipoter_rng.Row
-                                ale_in = ThisWorkbook.Sheets(sheet_names(y)).Cells(ipoter_row, 12).Text
-                                mb.Sheets(1).Cells(x, 12) = ale_in
-                                For Z = LBound(alergy) To UBound(alergy)
-                                    ale_c(Z) = ale_c(Z) + InStr(ale_in, alergy(Z))
-                                Next Z
-                            Exit For
-                        End If
-                        Next y
-                    Next x
-                    
-                    'For x = 1 To 20
-                        'For y = 1 To 28
-                            'ale_c(y) = ale_c(y) + InStr(tw.Cells(x, "BB").Text, alergy(y))
-                        'Next y
-                    'Next x
-                    
-                    For x = LBound(alergy) To UBound(alergy)
-                        If ale_c(x) <> 0 Then
-                            ale = ale & " " & alergy(x)
-                        End If
-                    Next x
-                    
-                    For x = 11 To 18
-                        Set num_rng = ThisWorkbook.Sheets(x).Columns(2).Find(num)
-                        If Not num_rng Is Nothing Then
-                            ThisWorkbook.Sheets(x).Cells(num_rng.Row, 6) = ale
-                        End If
-                        
-                        Set num_rng = ThisWorkbook.Sheets(sheet_names(UBound(sheet_names))).Columns(1).Find(num)
-                        If Not num_rng Is Nothing Then
-                            ThisWorkbook.Sheets(sheet_names(UBound(sheet_names))).Cells(num_rng.Row, 12) = ale
-                            Exit For
-                        End If
-                    Next x
-                    
-                    y = mb.Sheets(1).Columns(1).Find("IPOTER番号").Row + 24
-                    'For x = 1 To 20
-                        'mb.Sheets(1).Cells(y, 12) = tw.Cells(x, "BB").Text
-                        'y = y + 1
-                    'Next x
-                    mb.Sheets(1).Cells(y, 1) = ale
-                    mb.Save
-                    mb.Close
-                    Set mb = Nothing
-                    ale = ""
-                    '処理ここまで
-                    file_name = Dir
-                Loop
+                Call process_excel_files_in_folder(path(k, i), xlApp, alergy, sheet_names)
             Next k
         Next i
     Next h
-    
-    Set mb = Nothing
+
     Set xlApp = Nothing
     
     For i = 34 To 68 Step 2
@@ -311,7 +196,101 @@ Sub update_all()
     Unload UserForm1
     
 End Sub
+
+Private Sub process_excel_files_in_folder(folder_path As String, xlApp As Object, alergy As Variant, sheet_names As Variant)
+
+    Dim file_name As String
+    Dim mb As Workbook
+
+    file_name = Dir(folder_path & "\*.xlsx")
+
+    Do While file_name <> ""
+        Set mb = xlApp.Workbooks.Open(Filename:=folder_path & "\" & file_name, UpdateLinks:=0)
+        Call process_single_menu_workbook(mb, alergy, sheet_names)
+        mb.Save
+        mb.Close
+        Set mb = Nothing
+        file_name = Dir
+    Loop
+
+End Sub
+
+Private Sub process_single_menu_workbook(mb As Workbook, alergy As Variant, sheet_names As Variant)
+
+    Dim x As Long
+    Dim y As Long
+    Dim z As Long
+    Dim num As Variant
+    Dim ale As String
+    Dim ipoter As String
+    Dim ale_in As String
+    Dim ipoter_row As Long
+    Dim ale_c(1 To 28) As Long
+    Dim ipoter_rng As Range
+    Dim num_rng As Range
+    Dim ipoter_header_rng As Range
+    Dim detail_start_row As Long
+
+    For x = LBound(alergy) To UBound(alergy)
+        ale_c(x) = 0
+    Next x
+
+    Set ipoter_header_rng = mb.Sheets(1).Columns(1).Find("IPOTER番号")
+    If ipoter_header_rng Is Nothing Then
+        Exit Sub
+    End If
+
+    num = mb.Sheets(1).Cells(5, 10).Value
+    detail_start_row = ipoter_header_rng.Row + 1
+
+    For x = detail_start_row To detail_start_row + 19
+        ipoter = Replace(CStr(mb.Sheets(1).Cells(x, 1).Value), Chr(160), " ")
+        ipoter = Trim(ipoter)
+
+        For y = LBound(sheet_names) To UBound(sheet_names)
+            Set ipoter_rng = ThisWorkbook.Sheets(sheet_names(y)).Columns(1).Find(ipoter)
+            If Not ipoter_rng Is Nothing Then
+                ipoter_row = ipoter_rng.Row
+                ale_in = ThisWorkbook.Sheets(sheet_names(y)).Cells(ipoter_row, 12).Text
+                mb.Sheets(1).Cells(x, 12) = ale_in
+                For z = LBound(alergy) To UBound(alergy)
+                    ale_c(z) = ale_c(z) + InStr(ale_in, alergy(z))
+                Next z
+                Exit For
+            End If
+        Next y
+    Next x
+
+    For x = LBound(alergy) To UBound(alergy)
+        If ale_c(x) <> 0 Then
+            ale = ale & " " & alergy(x)
+        End If
+    Next x
+
+    For x = 11 To 18
+        Set num_rng = ThisWorkbook.Sheets(x).Columns(2).Find(num)
+        If Not num_rng Is Nothing Then
+            ThisWorkbook.Sheets(x).Cells(num_rng.Row, 6) = ale
+        End If
+
+        Set num_rng = ThisWorkbook.Sheets(sheet_names(UBound(sheet_names))).Columns(1).Find(num)
+        If Not num_rng Is Nothing Then
+            ThisWorkbook.Sheets(sheet_names(UBound(sheet_names))).Cells(num_rng.Row, 12) = ale
+            Exit For
+        End If
+    Next x
+
+    mb.Sheets(1).Cells(ipoter_header_rng.Row + 24, 1) = ale
+
+End Sub
 Function search_menu_f(sheet)
+    Dim i As Long
+    Dim ipoter_row As Long
+    Dim ale_r As Long
+    Dim ale_c As Long
+    Dim ipoter As String
+    Dim menu As String
+    Dim ale As String
     
     Dim ws As Worksheet
     Dim tw As Worksheet
@@ -387,6 +366,8 @@ Private Function get_allergen_list() As Variant
 End Function
 
 Function update_f(sheet)
+    Dim ipoter As String
+    Dim ipoter_row As Long
 
     Dim ws As Worksheet
     Dim tw As Worksheet

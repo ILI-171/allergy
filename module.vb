@@ -1,11 +1,15 @@
+Option Explicit
+
 Sub alergy_list()
 
+    Dim i As Long
     Dim j As Long
     Dim idx As Long
+    Dim c As Long
+    Dim alergy_column As Long
+    Dim alergy_num As Long
     Dim sheet_name As String
     Dim alergy_range As Range
-    Dim alergy_range_1 As Range
-    Dim alergy_range_2 As Range
     Dim menu_sheets As Variant
     Dim row_colors As Variant
     
@@ -24,7 +28,7 @@ Sub alergy_list()
     If alergy_range Is Nothing Then
     
         MsgBox ("アレルギーがないため利用不要です")
-        Exit Sub
+        GoTo Cleanup
     
     Else
     
@@ -50,6 +54,7 @@ Sub alergy_list()
     
     ThisWorkbook.Sheets(sheet_name).Range("B6:BE600").Font.color = vbBlack
     
+Cleanup:
     Application.Calculation = xlCalculationAutomatic
     Application.ScreenUpdating = True
     
@@ -57,12 +62,23 @@ Sub alergy_list()
     
 End Sub
 
-Function alergy_check(sheet, num, color)
+Function alergy_check(sheet As String, num As Long, color As Long)
 
     Application.Calculation = xlCalculationManual
     Application.ScreenUpdating = False
 
+    Dim i As Long
+    Dim j As Long
+    Dim ac As Long
+    Dim acp As Long
     Dim k As Long
+    Dim dead As Long
+    Dim num_1 As Long
+    Dim sheet_name As String
+    Dim alergy_column As Long
+    Dim alergy_columns_prim As Long
+    Dim alergy_kind_prim As String
+    Dim alergy_kind As String
 
     sheet_name = "利用可能リスト"
     
@@ -191,10 +207,10 @@ Private Sub copy_detail_columns(source_sheet As String, source_row As Long, targ
     Dim target_end_columns As Variant
     Dim idx As Long
 
-    source_start_columns = settings_alergy_copy_detail_source_start_columns()
-    source_end_columns = settings_alergy_copy_detail_source_end_columns()
-    target_start_columns = settings_alergy_copy_detail_target_start_columns()
-    target_end_columns = settings_alergy_copy_detail_target_end_columns()
+    source_start_columns = Array("H", "S")
+    source_end_columns = Array("O", "AL")
+    target_start_columns = Array("AD", "AL")
+    target_end_columns = Array("AK", "BE")
 
     For idx = LBound(source_start_columns) To UBound(source_start_columns)
         ThisWorkbook.Sheets(source_sheet).Range(source_start_columns(idx) & source_row & ":" & source_end_columns(idx) & source_row).Copy
